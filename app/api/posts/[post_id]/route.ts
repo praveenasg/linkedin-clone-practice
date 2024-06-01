@@ -19,23 +19,3 @@ export async function GET(
     });
   }
 }
-
-export async function DELETE(
-  request: Request,
-  { params: { post_id } }: { params: { post_id: string } }
-) {
-  await connectDB();
-  try {
-    const post = await Post.findById(post_id);
-    if (!post) {
-      return Response.json({ error: "Post not found", status: 404 });
-    }
-    await post.removePost();
-    return Response.json({ message: "post liked succesfully", status: 200 });
-  } catch (error) {
-    return Response.json({
-      message: "Error, unable to delete post",
-      status: 500,
-    });
-  }
-}

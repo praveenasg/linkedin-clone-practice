@@ -5,19 +5,29 @@ import { useUser } from "@clerk/nextjs";
 import TimeAgo from "react-timeago";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { MessageSquareTextIcon, ThumbsUpIcon, Trash2Icon } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  MessageSquareTextIcon,
+  Send,
+  ThumbsUpIcon,
+  Trash2Icon,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { like_Post_request_body } from "@/app/api/posts/[post_id]/like/route";
 import { toast } from "sonner";
 import { deletePostAction } from "@/Actions/deletePostAction";
+import commentPostAction from "@/Actions/commentPostAction";
+import ReactTimeago from "react-timeago";
 
 function PostWidget({ post }: { post: IPostDocument }) {
   const { user } = useUser();
   const isAuthor = user?.id === post.user.userId;
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes);
+  const [commentsopen, setCommentsOpen] = useState(false);
+  const commentref = useRef<HTMLInputElement>(null);
 
+  //to set initial values on load
   useEffect(() => {
     if (user?.id && post.likes?.includes(user.id)) {
       setLiked(true);
@@ -26,6 +36,7 @@ function PostWidget({ post }: { post: IPostDocument }) {
     }
   }, [post, user]);
 
+  //like unlike function
   async function handleclicklike() {
     if (user) {
       const request_body: like_Post_request_body = {
@@ -60,6 +71,18 @@ function PostWidget({ post }: { post: IPostDocument }) {
     }
   }
 
+  //handle add comment function
+  async function handlecomment() {
+    const comment = commentref.current?.value;
+    if (commentref.current) {
+      commentref.current.value = "";
+    }
+    if (!comment) {
+      return;
+    }
+    commentPostAction(comment, post._id.toString());
+  }
+
   return (
     <div className="bg-white rounded-lg p-3 shadow-md space-y-2">
       <div className="flex justify-between items-center">
@@ -75,11 +98,13 @@ function PostWidget({ post }: { post: IPostDocument }) {
             <div className="text-xs font-light">
               {isAuthor && <span>Author</span>}
               <p>
-                Posted : <TimeAgo date={post.createdAt} />
+                <TimeAgo date={post.createdAt} />
               </p>
             </div>
           </div>
         </div>
+
+        {/* delete button */}
         {isAuthor && (
           <Button
             variant="secondary"
@@ -125,12 +150,19 @@ function PostWidget({ post }: { post: IPostDocument }) {
           <ThumbsUpIcon size={16} /> <span>{liked ? "liked" : "like"}</span>
         </Button>
 
-        <Button variant="secondary" className="space-x-1">
+        <Button
+          variant="secondary"
+          className="space-x-1"
+          onClick={() => {
+            setCommentsOpen(!commentsopen);
+          }}
+        >
           <MessageSquareTextIcon size={16} /> <span>Comment</span>
         </Button>
       </div>
-      <div>
-        <form action="">
+      {commentsopen && (
+        // comments section
+        <>
           <div className="flex space-x-1">
             <Avatar>
               <AvatarImage src={user?.imageUrl || ""} />
@@ -143,11 +175,45 @@ function PostWidget({ post }: { post: IPostDocument }) {
               name="post_content"
               id="post_content"
               placeholder="Write a comment...."
+              ref={commentref}
             />
+            <Button variant="link" onClick={handlecomment}>
+              <Send size={16} />
+            </Button>
           </div>
-        </form>
-      </div>
-      {/* <CommentsWidget /> */}
+          {/* show list of comments on the UI */}
+          <div className="space-y-1 max-h-60 overflow-y-auto">
+            {post.comments?.map((comment) => (
+              <div key={comment._id.toString()}>
+                <div className="bg-gray-100 px-4 py-2 rounded-md">
+                  <div className="flex items-center space-x-1">
+                    <Avatar>
+                      <AvatarImage src={comment.user.userImage} />
+                      <AvatarFallback>
+                        {comment.user.firstName?.charAt(0)}
+                        {comment.user.lastname?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div>
+                        <p className="font-semibold">
+                          {comment.user.firstName} {comment.user.lastname}
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-gray-400">
+                        <ReactTimeago date={new Date(comment.createdAt)} />
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="mt-3 text-sm">{comment.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
