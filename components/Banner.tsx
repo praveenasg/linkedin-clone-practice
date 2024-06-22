@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import React from "react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 async function Banner() {
   const user = await currentUser();
@@ -20,9 +21,15 @@ async function Banner() {
               className="rounded-full"
             />
             <div>
-              <p className="font-bold">
-                {user?.firstName?.toUpperCase()} {user?.lastName?.toUpperCase()}
-              </p>
+              <Link
+                href={`/profile/${user?.firstName?.toUpperCase()}_${user?.lastName?.toUpperCase()}`}
+                className="hover:underline"
+              >
+                <p className="font-bold">
+                  {user?.firstName?.toUpperCase()}{" "}
+                  {user?.lastName?.toUpperCase()}
+                </p>
+              </Link>
               <p>React | Next js | Full Stack Developer</p>
             </div>
           </div>
