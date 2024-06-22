@@ -49,6 +49,7 @@ BioSchema.methods.updateBio = async function (data: IBioBase) {
   // console.log("update document", updateDocument);
   console;
   try {
+    // console.log("updateDocument in updateBio in profile.ts", updateDocument);
     await Bio.updateOne({ userId: data.userId }, updateDocument);
     return data;
   } catch (error) {
