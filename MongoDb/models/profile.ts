@@ -17,6 +17,8 @@ interface IBioModel extends Model<IBioDocument, IBioMethods> {}
 const BioSchema = new Schema<IBioDocument>(
   {
     userId: { type: String, required: true },
+    profileURL: { type: String, required: false },
+    profileBackgroundURL: { type: String, required: false },
     name: { type: String, required: true },
     country: { type: String, required: false },
     bio: { type: String, required: false },
@@ -36,6 +38,8 @@ BioSchema.methods.updateBio = async function (data: IBioBase) {
     $set: {
       userId: data.userId,
       name: data.name,
+      profileBackgroundURL: data.profileBackgroundURL,
+      profileURL: data.profileURL,
       country: data.country,
       bio: data.bio,
       state: data.state,
@@ -49,6 +53,7 @@ BioSchema.methods.updateBio = async function (data: IBioBase) {
   // console.log("update document", updateDocument);
   console;
   try {
+    // console.log("updateDocument in updateBio in profile.ts", updateDocument);
     await Bio.updateOne({ userId: data.userId }, updateDocument);
     return data;
   } catch (error) {
@@ -60,6 +65,8 @@ export async function createBio(userId: string, name: string) {
   const data: IBioBase = {
     userId: userId,
     name: name,
+    profileBackgroundURL: "",
+    profileURL: "",
     country: "",
     bio: "",
     state: "",

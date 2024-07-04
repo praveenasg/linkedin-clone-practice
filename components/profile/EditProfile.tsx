@@ -11,7 +11,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { updateBioState } from "@/features/bio/bioSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import { IBioBase } from "@/types/profile";
@@ -42,6 +41,8 @@ const formSchema = z.object({
 
 export function EditProfile({
   userId,
+  profileBackgroundURL,
+  profileURL,
   name,
   country,
   bio,
@@ -64,7 +65,12 @@ export function EditProfile({
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const updated_info = await updateBioPostAction(values as IBioBase, userId);
+    const updated_info = await updateBioPostAction(
+      values as IBioBase,
+      userId,
+      profileURL,
+      profileBackgroundURL
+    );
     dispatch(updateBioState(updated_info));
   }
   return (
