@@ -41,6 +41,8 @@ const formSchema = z.object({
 
 export function EditProfile({
   userId,
+  profileBackgroundURL,
+  profileURL,
   name,
   country,
   bio,
@@ -63,7 +65,12 @@ export function EditProfile({
     },
   });
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const updated_info = await updateBioPostAction(values as IBioBase, userId);
+    const updated_info = await updateBioPostAction(
+      values as IBioBase,
+      userId,
+      profileURL,
+      profileBackgroundURL
+    );
     dispatch(updateBioState(updated_info));
   }
   return (

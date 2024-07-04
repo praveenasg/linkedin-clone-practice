@@ -3,10 +3,17 @@ import { connectDB } from "@/MongoDb/db";
 import { Bio } from "@/MongoDb/models/profile";
 import { IBioBase } from "@/types/profile";
 
-export async function updateBioPostAction(formdata: IBioBase, userId: string) {
+export async function updateBioPostAction(
+  formdata: IBioBase,
+  userId: string,
+  profileURL: string,
+  profileBackgroundURL: string
+) {
   // console.log(formdata);
   const updated_bio: IBioBase = {
     bio: formdata.bio,
+    profileBackgroundURL: profileBackgroundURL,
+    profileURL: profileURL,
     city: formdata.city,
     country: formdata.country,
     name: formdata.name,

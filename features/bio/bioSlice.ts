@@ -5,6 +5,8 @@ import type { IBioBase } from "@/types/profile";
 // Define the initial state using that type
 const initialState: IBioBase = {
   userId: "",
+  profileBackgroundURL: "",
+  profileURL: "",
   name: "",
   country: "",
   bio: "",
@@ -13,6 +15,7 @@ const initialState: IBioBase = {
   school: "",
   pronouns: "",
 };
+
 export const fetchBio = createAsyncThunk(
   "bio/fetchBio",
   async (userId: string) => {
